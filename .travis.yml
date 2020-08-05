@@ -37,9 +37,9 @@ jobs:
         #- env: CHOPSTIX_SYSZ_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=Z
         - env: CHOPSTIX_X86_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=X86_SQLITE
         - env: CHOPSTIX_X86_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=X86
-        - arch: pp64le
+        - arch: ppc64le
           env: CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=POWERLE_SQLITE
-        - arch: pp64le
+        - arch: ppc64le
           env: CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=POWERLE
         #- arch: pp64le
         #  env: CHOPSTIX_POWERLE_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=POWERLE
@@ -50,7 +50,7 @@ jobs:
           
 before_install:
     - set -e
-    - shellcheck -x -s sh $(find . -name \*.sh) $(find . -name \*.sh.in) ./tools/chop-* ./test/drivers/* ./test/daxpy/*spec 
+    - shellcheck -s sh $(find . -name \*.sh) $(find . -name \*.sh.in) ./tools/chop-* ./test/drivers/* ./test/daxpy/*spec 
     - if [ "$CHOPSTIX_BUILD_SQLITE" == "OFF" ]; then sudo apt-get install libsqlite3-dev -y ; fi
     - if [ "$CHOPSTIX_SYSZ_SUPPORT" == "ON" ]; then sudo apt-get install gcc-s390x-linux-gnu g++-s390x-linux-gnu -y ; fi
     - if [ "$CHOPSTIX_POWER_SUPPORT" == "ON" ]; then sudo scripts/ci/install_advanced_toolchain.sh ; fi
