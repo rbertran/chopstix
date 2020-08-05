@@ -29,17 +29,26 @@ env:
         - CHOPSTIX_PERFMON_PREFIX=/tmp/libpfm
         - CHOPSTIX_BUILD_TESTS=ON
         - CTEST_OUTPUT_ON_FAILURE=1
-    jobs:
-        - CHOPSTIX_POWER_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=POWER
-        - CHOPSTIX_POWERLE_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=POWERLE
-        - CHOPSTIX_SYSZ_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=Z
-        - CHOPSTIX_X86_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=X86_SQLITE
-        - CHOPSTIX_X86_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=X86
+jobs:
+    fast_finish: true
+    include:
+        #- env: CHOPSTIX_POWER_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=POWER
+        #- env: CHOPSTIX_POWERLE_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=POWERLE
+        #- env: CHOPSTIX_SYSZ_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=Z
+        #- env: CHOPSTIX_X86_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=X86_SQLITE
+        - env: CHOPSTIX_X86_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=X86
+        #- arch: pp64le
+        #  env: CHOPSTIX_POWERLE_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=POWERLE
+        #- arch: pp64le
+        #  env: CHOPSTIX_POWERLE_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=POWERLE
+        #- arch: s390x
+        #  env: CHOPSTIX_SYSZ_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=ON CACHE_NAME=Z
+        #- arch: s390x
+        #  env: CHOPSTIX_SYSZ_SUPPORT=ON CHOPSTIX_BUILD_SQLITE=OFF CACHE_NAME=Z
+          
 before_install:
     - set -e
-    - echo "Before install"
-    - shellcheck -x -s sh $(find . -name \*.sh) $(find . -name \*.sh.in) ./tools/chop-* ./test/drivers/* ./test/daxpy/*spec
-    - env
+    - shellcheck -x -s sh $(find . -name \*.sh) $(find . -name \*.sh.in) ./tools/chop-* ./test/drivers/* ./test/daxpy/*spec 
     - if [ "$CHOPSTIX_BUILD_SQLITE" == "OFF" ]; then sudo apt-get install libsqlite3-dev -y ; fi
     - if [ "$CHOPSTIX_SYSZ_SUPPORT" == "ON" ]; then sudo apt-get install gcc-s390x-linux-gnu g++-s390x-linux-gnu -y ; fi
     - if [ "$CHOPSTIX_POWER_SUPPORT" == "ON" ]; then sudo scripts/ci/install_advanced_toolchain.sh ; fi
@@ -51,7 +60,7 @@ install:
     - if [ "$CHOPSTIX_POWER_SUPPORT" == "ON" ]; then CC=powerpc64-linux-gnu-gcc ARCH=ppc scripts/ci/install_libpfm.sh ; fi
     - if [ "$CHOPSTIX_POWERLE_SUPPORT" == "ON" ]; then CC=powerpc64le-linux-gnu-gcc ARCH=ppc scripts/ci/install_libpfm.sh ; fi
     - if [ "$CHOPSTIX_SYSZ_SUPPORT" == "ON" ]; then CC=s390x-linux-gnu-gcc ARCH=s390x scripts/ci/install_libpfm.sh ; fi
-    - if [ "$CHOPSTIX_X86_SUPPORT" == "ON" ]; then scripts/ci/install_libpfm.sh ; fi
+    - if [ "$CHOPSTIX_X86_SUPPORT" == "ON" ] || [ "$(uname -m)" != "x86_64" ]; then scripts/ci/install_libpfm.sh ; fi
 script:
     - set -e
     - echo "Script"
@@ -60,7 +69,7 @@ script:
     - if [ "$CHOPSTIX_POWER_SUPPORT" == "ON" ]; then cmake .. -DCMAKE_TOOLCHAIN_FILE=../scripts/cross/cross_ppc64.cmake ; fi
     - if [ "$CHOPSTIX_POWERLE_SUPPORT" == "ON" ]; then cmake .. -DCMAKE_TOOLCHAIN_FILE=../scripts/cross/cross_ppc64le.cmake ; fi
     - if [ "$CHOPSTIX_SYSZ_SUPPORT" == "ON" ]; then cmake ..  -DCMAKE_TOOLCHAIN_FILE=../scripts/cross/cross_s390x.cmake ; fi
-    - if [ "$CHOPSTIX_X86_SUPPORT" == "ON" ]; then cmake .. ; fi
+    - if [ "$CHOPSTIX_X86_SUPPORT" == "ON" ] || [ "$(uname -m)" != "x86_64" ]; then cmake .. ; fi
     - make -j2
     - sudo make install
-    # - if [ "$CHOPSTIX_X86_SUPPORT" == "ON" ]; then make test ; fi
+    - if [ "$CHOPSTIX_X87_SUPPORT" == "ON" ] || [ "$(uname -m)" != "x86_64" ] ; then make test ; fi
