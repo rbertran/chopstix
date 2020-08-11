@@ -31,6 +31,7 @@ testdir=$(printenv testdir)
 test_run() {
     ver="$1" ; shift
     echo "> test-$test $* ($ver)"
+    # shellcheck disable=SC2048,SC2086
     timeout "$TIMEOUT" "$testbin" $* > "output.$ver" || die "Error: test run failed"
 }
 
@@ -38,6 +39,7 @@ test_trace_function() {
     fun="$1" ; shift
     rm -rf chop.db
     echo "> chop trace function -name $fun test-$test $*"
+    # shellcheck disable=SC2048,SC2086
     timeout "$TIMEOUT" "$chop" trace function -name "$fun" "$testbin" $* > "output.trace-$fun" || die "Error: test trace function failed"
 }
 
@@ -55,7 +57,9 @@ test_trace() {
     echo "> chop trace $args test-$test $*"
     echo "> $chop trace $args -log-level debug $testbin $*"
 
-    export CHOPSTIX_TRACE_LIB=$(find $(pwd)/../../../ -name libcxtrace.so)
+    CHOPSTIX_TRACE_LIB=$(find "$(pwd)/../../../" -name libcxtrace.so)
+    export CHOPSTIX_TRACE_LIB
+    # shellcheck disable=SC2048,SC2086
     timeout "$TIMEOUT" "$chop" trace $args -log-level debug $testbin $* > "output.trace-$fun" || die "Error: test trace failed"
 
 }
