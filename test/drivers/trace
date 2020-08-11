@@ -21,6 +21,7 @@
 
 set -eu
 
+# shellcheck disable=SC1072
 die() { echo "$*" >&2 ; exit 1 ; }
 
 test=$(printenv test)
