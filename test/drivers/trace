@@ -31,20 +31,21 @@ testdir=$(printenv testdir)
 test_run() {
     ver="$1" ; shift
     echo "> test-$test $* ($ver)"
-    timeout "$TIMEOUT $testbin $*" > "output.$ver" || die "Error: test failed"
+    timeout "$TIMEOUT" "$testbin" $* > "output.$ver" || die "Error: test run failed"
 }
 
 test_trace_function() {
     fun="$1" ; shift
     rm -rf chop.db
     echo "> chop trace function -name $fun test-$test $*"
-    timeout "$TIMEOUT $chop trace function -name $fun $testbin $*" > "output.trace-$fun" || die "Error: test failed"
+    timeout "$TIMEOUT" "$chop" trace function -name "$fun" "$testbin" $* > "output.trace-$fun" || die "Error: test trace function failed"
 }
 
 test_trace() {
     fun="$1" ; shift
     rm -rf chop.db
     objdump -d "$testbin" > "test-$test.s"
+    # This is architecture dependend, implement power/z variants
     args=$(awk -v fun="$fun" '
     $0 ~ fun">:" { gsub(/^0*/,"",$1); begin=$1; flag=1 }
     flag && /\sret/ { gsub(/:/,"",$1); end=","$1 }
@@ -52,7 +53,10 @@ test_trace() {
     END { gsub(/^,/,"",end); print "-begin",begin,"-end",end }
     ' "test-$test.s")
     echo "> chop trace $args test-$test $*"
-    timeout "$TIMEOUT $chop trace address $args $testbin $*" > "output.trace-$fun" || die "Error: test failed"
+    echo "> $chop trace $args -log-level debug $testbin $*"
+
+    export CHOPSTIX_TRACE_LIB=$(find $(pwd)/../../../ -name libcxtrace.so)
+    timeout "$TIMEOUT" "$chop" trace $args -log-level debug $testbin $* > "output.trace-$fun" || die "Error: test trace failed"
 
 }
 

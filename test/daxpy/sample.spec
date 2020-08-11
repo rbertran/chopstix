@@ -20,4 +20,4 @@
 #
 
 #           size_kb  time_s
-test_sample 100 time 10
+# test_sample 100 time 10

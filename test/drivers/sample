@@ -38,7 +38,7 @@ test_event() {
     
 test_event task-clock
 test_event cpu-clock
-test_event cycles
+# test_event cycles
 
 [ -n "$event" ] || die "Error: no test event available"
 
@@ -52,7 +52,7 @@ test_sample() {
 
     echo "> chop sample -events $event -period $period test-$test $*"
     /usr/bin/time -f"%U" -o exec_time \
-        "$chop" sample -events "$event" -period "$period" "$testbin $*"
+        "$chop" sample -events "$event" -period "$period" "$testbin" $*
     
     exec_time=$(cat exec_time)
     clock_freq=$(lscpu | awk '/^CPU MHz:/ {print $3;exit}')

@@ -115,13 +115,13 @@ long ArchX86::set_pc(pid_t pid, long pc) const {
     return old_pc;
 }
 
-long ArchX86::get_sp(pid_t pid) const { failx("Not implemented"); }
-long ArchX86::set_sp(pid_t pid, long sp) const { failx("Not implemented"); }
-long ArchX86::get_lnk(pid_t pid) const { failx("Not implemented"); }
+long ArchX86::get_sp(pid_t pid) const { failx("'get_sp' not implemented for ArchX86"); }
+long ArchX86::set_sp(pid_t pid, long sp) const { failx("'set_sp' not implemented for ArchX86"); }
+long ArchX86::get_lnk(pid_t pid) const { failx("'get_lnk' not implemented for ArchX86"); }
 long ArchX86::parse_syscall(regbuf_type regs) const {
-    failx("Not implemented");
+    failx("'parse_syscall' not implemented for ArchX86");
 }
-long ArchX86::parse_ret(regbuf_type regs) const { failx("Not implemented"); }
+long ArchX86::parse_ret(regbuf_type regs) const { failx("'parse_ret' not implemented for ArchX86"); }
 void ArchX86::parse_args(regbuf_type regs, regbuf_type args) const {
-    failx("Not implemented");
+    failx("'parse_args' not implemented for ArchX86");
 }

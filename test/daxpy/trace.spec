@@ -65,22 +65,25 @@ check_content() {
 }
 
 test_daxpy() {
+
+    test_run normal "$1" iter "$2"
+
     export CHOPSTIX_OPT_LOG_PATH=cxtrace.log
     export CHOPSTIX_OPT_SAVE_CONTENT=no
     export CHOPSTIX_OPT_WITH_PERM='rw-,r*x'
 
-    test_run normal "$1" iter "$2"
-
-    test_run trace-quiet "$1" inst "$2"
+    test_run trace-quiet "$1" iter "$2"
+    test_trace daxpy "$1" iter "$2"
     validate_output normal trace-quiet
     check_trace trace-quiet
+
     mv cxtrace.log cxtrace.trace-quiet
 
     export CHOPSTIX_OPT_SAVE_CONTENT=yes
     export CHOPSTIX_OPT_TRACE_PATH=cxtrace.data
 
     rm -rf cxtrace.data
-    test_run trace-save "$1" inst "$2"
+    test_run trace-save "$1" iter "$2"
     validate_output normal trace-save
     check_trace trace-save
     check_content trace-save
@@ -93,6 +96,6 @@ test_daxpy() {
     check_trace trace-daxpy
     mv cxtrace.log cxtrace.trace-daxpy
 }
-
-test_daxpy 100 1
-test_daxpy 100 2
+ 
+# test_daxpy 100 100000
+# test_daxpy 100 200000

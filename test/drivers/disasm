@@ -31,7 +31,7 @@ testbin=$(printenv testbin)
 testdir=$(printenv testdir)
 
 echo "> chop disasm $test"
-"$chop disasm $testbin"
+"$chop" disasm "$testbin"
 
 echo "> checking database"
 test "$($chop list modules | wc -l)" -gt 0

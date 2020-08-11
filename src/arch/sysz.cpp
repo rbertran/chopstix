@@ -244,7 +244,7 @@ long ArchZ::set_sp(pid_t pid, long sp) const {
     return old_sp;
 }
 
-long ArchZ::get_lnk(pid_t pid) const { failx("Not implemented"); }
+long ArchZ::get_lnk(pid_t pid) const { failx("'get_lnk' not implemented for ArchZ"); }
 
 long ArchZ::parse_syscall(regbuf_type regs) const { return regs[SYSZ_R2]; }
 long ArchZ::parse_ret(regbuf_type regs) const { return regs[SYSZ_R2]; }

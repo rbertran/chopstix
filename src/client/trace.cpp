@@ -48,6 +48,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <iostream>
+
 using namespace chopstix;
 
 namespace fs = filesystem;
@@ -60,18 +62,33 @@ static double next_rand() { return (random() + 0.0) / RAND_MAX; }
 
 static std::string library_path() {
     char raw_path[PATH_MAX];
-    auto n = readlink("/proc/self/exe", raw_path, PATH_MAX);
-    std::string full_path{raw_path};
-    auto pos = full_path.rfind("bin/chop");
-    return full_path.substr(0, pos) + "/lib/libcxtrace.so";
+    char *tlib = getenv("CHOPSTIX_TRACE_LIB");
+    if (tlib != NULL) {
+        log::debug("Using CHOPSTIX_TRACE_LIB environment variable to find tracing lib");
+        std::string full_path{tlib};
+        log::debug("Library location: %s", full_path);
+        return full_path;
+    }
+    else
+    {
+        log::debug("Using default tracing lib location");
+        auto n = readlink("/proc/self/exe", raw_path, PATH_MAX);
+        std::string full_path{raw_path};
+        std::cout << raw_path << std::endl;
+        auto pos = full_path.rfind("bin/chop");
+        log::debug("Library location: %s", full_path.substr(0, pos) + "/lib/libcxtrace.so");
+        return full_path.substr(0, pos) + "/lib/libcxtrace.so";
+    }
 }
 
 static void preload(std::string path) {
     char *env_preload = getenv("LD_PRELOAD");
     if (env_preload != NULL) {
-        path += ':' + env_preload;
+        std::string env_preload_str(env_preload);
+        path += ':' + env_preload_str;
     }
     setenv("LD_PRELOAD", path.c_str(), 1);
+    log::debug("LD_PRELOAD value: %s" , path);
 }
 
 static long read_alt_stack() {
